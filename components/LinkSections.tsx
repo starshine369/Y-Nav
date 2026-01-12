@@ -64,13 +64,26 @@ const LinkSections: React.FC<LinkSectionsProps> = ({
   renderLinkCard,
   SortableLinkCard
 }) => {
+  const showPinnedSection = pinnedLinks.length > 0 && !searchQuery && (selectedCategory === 'all');
+  const showMainSection = (selectedCategory !== 'all' || searchQuery);
   const gridClassName = siteCardStyle === 'detailed'
     ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
     : 'grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8';
 
   return (
     <div className="flex-1 overflow-y-auto px-4 lg:px-10 pb-10 space-y-8">
-      {pinnedLinks.length > 0 && !searchQuery && (selectedCategory === 'all') && (
+      {!showPinnedSection && !showMainSection && (
+        <div className="flex justify-center pt-6">
+          <button
+            onClick={onAddLink}
+            className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-slate-600 dark:text-slate-300 bg-white/70 dark:bg-slate-900/60 border border-slate-200/60 dark:border-white/10 hover:text-sky-600 hover:border-sky-300 dark:hover:border-sky-500 transition-colors"
+          >
+            <span className="text-base leading-none">+</span> 添加网址
+          </button>
+        </div>
+      )}
+
+      {showPinnedSection && (
         <section>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
@@ -101,14 +114,24 @@ const LinkSections: React.FC<LinkSectionsProps> = ({
                 </button>
               </div>
             ) : (
-              <button
-                onClick={onStartPinnedSorting}
-                className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-full transition-colors"
-                title="排序"
-              >
-                <GripVertical size={14} />
-                <span>排序</span>
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={onAddLink}
+                  className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-full border border-slate-200/70 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:text-sky-500 hover:border-sky-300 dark:hover:border-sky-500 transition-colors"
+                  title="添加链接"
+                >
+                  <span className="text-base leading-none">+</span>
+                  <span>添加</span>
+                </button>
+                <button
+                  onClick={onStartPinnedSorting}
+                  className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-full transition-colors"
+                  title="排序"
+                >
+                  <GripVertical size={14} />
+                  <span>排序</span>
+                </button>
+              </div>
             )}
           </div>
           {isSortingPinned ? (
@@ -136,7 +159,7 @@ const LinkSections: React.FC<LinkSectionsProps> = ({
         </section>
       )}
 
-      {(selectedCategory !== 'all' || searchQuery) && (
+      {showMainSection && (
         <section>
           {(!pinnedLinks.length && !searchQuery && selectedCategory === 'all') && (
             <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg flex items-center justify-between">
@@ -185,6 +208,14 @@ const LinkSections: React.FC<LinkSectionsProps> = ({
                 </div>
               ) : (
                 <div className="flex gap-2">
+                  <button
+                    onClick={onAddLink}
+                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-full border border-slate-200/70 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:text-sky-500 hover:border-sky-300 dark:hover:border-sky-500 transition-colors"
+                    title="添加链接"
+                  >
+                    <span className="text-base leading-none">+</span>
+                    <span>添加</span>
+                  </button>
                   <button
                     onClick={onToggleBatchEditMode}
                     className={`flex items-center gap-1 px-3 py-1.5 text-white text-xs font-medium rounded-full transition-colors ${

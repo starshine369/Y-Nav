@@ -1395,7 +1395,6 @@ function App() {
             onOpenSidebar={() => setSidebarOpen(true)}
             onToggleTheme={toggleTheme}
             onViewModeChange={handleViewModeChange}
-            onAddLink={() => { setEditingLink(undefined); setIsModalOpen(true); }}
             onSearchModeChange={handleSearchModeChange}
             onOpenSearchConfig={() => setIsSearchConfigModalOpen(true)}
             onSearchQueryChange={setSearchQuery}
@@ -1441,7 +1440,7 @@ function App() {
             onBatchDelete={handleBatchDelete}
             onSelectAll={handleSelectAll}
             onBatchMove={handleBatchMove}
-            onAddLink={() => setIsModalOpen(true)}
+            onAddLink={() => { setEditingLink(undefined); setPrefillLink(undefined); setIsModalOpen(true); }}
             renderLinkCard={renderLinkCard}
             SortableLinkCard={SortableLinkCard}
           />
