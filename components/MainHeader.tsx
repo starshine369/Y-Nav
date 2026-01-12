@@ -118,12 +118,12 @@ const MainHeader: React.FC<MainHeaderProps> = ({
       )}
 
       <div className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-100/80 dark:bg-slate-700/50 px-2 py-1.5 backdrop-blur">
-        <div className="flex items-center gap-1 bg-slate-200/60 dark:bg-slate-800/70 rounded-md p-1">
+        <div className="flex items-center gap-3 px-3 border-r border-slate-300 dark:border-white/10 mr-2">
           <button
             onClick={() => onSearchModeChange('internal')}
-            className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${searchMode === 'internal'
-              ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm'
-              : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100'
+            className={`text-sm font-bold transition-all pb-0.5 ${searchMode === 'internal'
+                ? 'text-slate-900 dark:text-white border-b-2 border-emerald-500'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             title="站内搜索"
           >
@@ -131,9 +131,9 @@ const MainHeader: React.FC<MainHeaderProps> = ({
           </button>
           <button
             onClick={() => onSearchModeChange('external')}
-            className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${searchMode === 'external'
-              ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm'
-              : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100'
+            className={`text-sm font-bold transition-all pb-0.5 ${searchMode === 'external'
+                ? 'text-slate-900 dark:text-white border-b-2 border-emerald-500'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             title="站外搜索"
           >

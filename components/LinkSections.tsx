@@ -55,8 +55,8 @@ const LinkSections: React.FC<LinkSectionsProps> = ({
   const showPinnedSection = pinnedLinks.length > 0 && !searchQuery && (selectedCategory === 'all');
   const showMainSection = (selectedCategory !== 'all' || searchQuery);
   const gridClassName = siteCardStyle === 'detailed'
-    ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6'
-    : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8';
+    ? 'grid-cols-[repeat(auto-fill,minmax(250px,1fr))]'
+    : 'grid-cols-[repeat(auto-fill,minmax(180px,1fr))]';
 
   return (
     <div className="flex-1 overflow-y-auto px-4 lg:px-10 pb-10 space-y-8">
@@ -146,11 +146,10 @@ const LinkSections: React.FC<LinkSectionsProps> = ({
               <div className="flex gap-2">
                 <button
                   onClick={onToggleBatchEditMode}
-                  className={`flex items-center gap-1 px-3 py-1.5 text-white text-xs font-medium rounded-full transition-colors ${
-                    isBatchEditMode
-                      ? 'bg-red-600 hover:bg-red-700'
-                      : 'bg-blue-600 hover:bg-blue-700'
-                  }`}
+                  className={`flex items-center gap-1 px-3 py-1.5 text-white text-xs font-medium rounded-full transition-colors ${isBatchEditMode
+                    ? 'bg-red-600 hover:bg-red-700'
+                    : 'bg-blue-600 hover:bg-blue-700'
+                    }`}
                   title={isBatchEditMode ? '退出批量编辑' : '批量编辑'}
                 >
                   {isBatchEditMode ? '取消' : '批量编辑'}

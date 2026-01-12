@@ -75,14 +75,14 @@ const Sidebar: React.FC<SidebarProps> = ({
           onClick={onSelectAll}
           title="置顶网站"
           className={`relative rounded-xl transition-all ${isSidebarCollapsed ? 'w-full flex items-center justify-center px-2 py-3' : 'w-full flex items-center gap-3 px-4 py-3'} ${selectedCategory === 'all'
-            ? 'bg-slate-100/60 dark:bg-white/5 text-slate-900 dark:text-slate-100 font-medium'
+            ? 'bg-gradient-to-r from-blue-500/20 to-transparent border-l-4 border-blue-500 text-blue-400 font-bold'
             : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50/70 dark:hover:bg-white/5'
             }`}
         >
           {!isSidebarCollapsed && selectedCategory === 'all' && (
-            <span className="absolute left-2 top-1/2 -translate-y-1/2 h-6 w-1 rounded-full bg-accent"></span>
+            <span className="hidden"></span>
           )}
-          <div className={`${isSidebarCollapsed ? 'p-2.5 rounded-xl' : 'p-1'} ${selectedCategory === 'all' ? 'bg-accent/15 text-accent' : 'bg-slate-100 dark:bg-slate-800'} flex items-center justify-center`}>
+          <div className={`${isSidebarCollapsed ? 'p-2.5 rounded-xl' : 'p-1'} ${selectedCategory === 'all' ? 'text-blue-400' : 'bg-slate-100 dark:bg-slate-800'} flex items-center justify-center`}>
             <Icon name="LayoutGrid" size={18} />
           </div>
           {!isSidebarCollapsed && <span>置顶网站</span>}
