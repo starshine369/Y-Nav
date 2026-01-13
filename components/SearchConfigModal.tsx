@@ -9,8 +9,8 @@ interface SearchConfigModalProps {
   onSave: (sources: ExternalSearchSource[]) => void;
 }
 
-const SearchConfigModal: React.FC<SearchConfigModalProps> = ({ 
-  isOpen, onClose, sources, onSave 
+const SearchConfigModal: React.FC<SearchConfigModalProps> = ({
+  isOpen, onClose, sources, onSave
 }) => {
   const [localSources, setLocalSources] = useState<ExternalSearchSource[]>(sources);
   const [isEditing, setIsEditing] = useState<string | null>(null);
@@ -30,7 +30,7 @@ const SearchConfigModal: React.FC<SearchConfigModalProps> = ({
 
   const handleAddSource = () => {
     if (!newSource.name || !newSource.url) return;
-    
+
     const source: ExternalSearchSource = {
       id: Date.now().toString(),
       name: newSource.name!,
@@ -39,7 +39,7 @@ const SearchConfigModal: React.FC<SearchConfigModalProps> = ({
       enabled: newSource.enabled !== false,
       createdAt: Date.now()
     };
-    
+
     setLocalSources([...localSources, source]);
     setNewSource({ name: '', url: '', icon: 'Globe', enabled: true });
   };
@@ -57,7 +57,7 @@ const SearchConfigModal: React.FC<SearchConfigModalProps> = ({
   };
 
   const handleToggleEnabled = (id: string) => {
-    setLocalSources(localSources.map(source => 
+    setLocalSources(localSources.map(source =>
       source.id === id ? { ...source, enabled: !source.enabled } : source
     ));
   };
@@ -76,7 +76,7 @@ const SearchConfigModal: React.FC<SearchConfigModalProps> = ({
         icon: 'Search',
         enabled: true,
         createdAt: Date.now()
-      },  
+      },
       {
         id: 'google',
         name: 'Google',
@@ -150,7 +150,7 @@ const SearchConfigModal: React.FC<SearchConfigModalProps> = ({
         createdAt: Date.now()
       }
     ];
-    
+
     setLocalSources(defaultSources);
   };
 
@@ -164,9 +164,15 @@ const SearchConfigModal: React.FC<SearchConfigModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden border border-slate-200 dark:border-slate-700 flex flex-col max-h-[90vh]">
-        
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+      onClick={handleCancel}
+    >
+      <div
+        className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden border border-slate-200 dark:border-slate-700 flex flex-col max-h-[90vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
+
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-700 shrink-0">
           <div className="flex items-center gap-2">
@@ -180,7 +186,7 @@ const SearchConfigModal: React.FC<SearchConfigModalProps> = ({
 
         {/* Content */}
         <div className="p-6 space-y-6 overflow-y-auto">
-          
+
           {/* 添加新搜索源 */}
           <div className="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-lg">
             <h3 className="text-sm font-medium dark:text-white mb-3">添加新搜索源</h3>

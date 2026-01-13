@@ -151,8 +151,14 @@ const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden border border-slate-200 dark:border-slate-700 flex flex-col max-h-[85vh]">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden border border-slate-200 dark:border-slate-700 flex flex-col max-h-[85vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-700">
           <h3 className="text-lg font-semibold dark:text-white">分类管理</h3>
           <div className="flex items-center gap-2">
@@ -352,8 +358,14 @@ const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
 
           {/* 图标选择器弹窗 */}
           {isIconSelectorOpen && (
-            <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-              <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+            <div
+              className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+              onClick={cancelIconSelector}
+            >
+              <div
+                className="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
                   <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">选择图标</h3>
                   <button
