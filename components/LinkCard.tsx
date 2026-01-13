@@ -25,14 +25,14 @@ const LinkCard: React.FC<LinkCardProps> = ({
 
     const cardClasses = `
         group relative transition-all duration-300 rounded-2xl
-        border bg-white dark:bg-slate-900/50 backdrop-blur-sm
+        border bg-white dark:bg-slate-900/40 backdrop-blur-sm
         ${isBatchEditMode
             ? 'cursor-pointer border-slate-200 dark:border-white/10'
-            : 'hover:-translate-y-1 hover:shadow-lg hover:shadow-accent/5 cursor-pointer'
+            : 'hover:-translate-y-1 hover:shadow-xl hover:shadow-accent/10 cursor-pointer'
         }
         ${isSelected
             ? 'border-rose-500 ring-2 ring-rose-500/20 bg-rose-50 dark:bg-rose-900/10'
-            : 'border-slate-200/80 dark:border-white/5 hover:border-accent/50 dark:hover:border-accent/40'
+            : 'border-slate-200/60 dark:border-white/5 hover:border-accent/40 dark:hover:border-accent/40'
         }
         ${isDetailedView ? 'p-5' : 'p-3.5'}
     `;

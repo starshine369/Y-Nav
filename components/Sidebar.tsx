@@ -169,8 +169,8 @@ const Sidebar: React.FC<SidebarProps> = ({
           onClick={onSelectAll}
           title="置顶网站"
           className={`relative w-full rounded-xl transition-all duration-200 mb-1Group ${isSidebarCollapsed ? 'flex items-center justify-center p-2.5' : 'flex items-center gap-3 px-3 py-2.5'} ${selectedCategory === 'all'
-            ? 'bg-gradient-to-r from-accent/15 to-transparent text-accent shadow-sm ring-1 ring-inset ring-accent/20'
-            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-slate-200'
+            ? 'bg-gradient-to-r from-accent/20 via-accent/5 to-transparent text-accent shadow-sm border border-accent/10'
+            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-slate-200 border border-transparent'
             }`}
         >
           {!isSidebarCollapsed && selectedCategory === 'all' && (
@@ -221,8 +221,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                   ? 'flex items-center justify-center p-2.5'
                   : 'flex items-center gap-3 px-3 py-2'
                   } ${isSelected
-                    ? 'bg-gradient-to-r from-accent/15 to-transparent text-accent shadow-sm ring-1 ring-inset ring-accent/20'
-                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-slate-200'
+                    ? 'bg-gradient-to-r from-accent/20 via-accent/5 to-transparent text-accent shadow-sm border border-accent/10'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-slate-200 border border-transparent'
                   }`}
               >
                 {!isSidebarCollapsed && isSelected && (
