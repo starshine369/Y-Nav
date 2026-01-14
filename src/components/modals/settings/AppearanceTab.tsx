@@ -6,9 +6,38 @@ interface AppearanceTabProps {
     onChange: (key: keyof SiteSettings, value: any) => void;
 }
 
+const DEFAULT_ACCENT_COLOR = '99 102 241';
+
+const parseRgbString = (value: string) => {
+    const parts = value.trim().split(/\s+/).map(part => Number(part));
+    if (parts.length < 3 || parts.some((part) => Number.isNaN(part))) {
+        return null;
+    }
+    return parts.slice(0, 3).map((part) => Math.min(255, Math.max(0, Math.round(part))));
+};
+
+const rgbStringToHex = (value: string) => {
+    const parts = parseRgbString(value) || parseRgbString(DEFAULT_ACCENT_COLOR) || [99, 102, 241];
+    return `#${parts.map((part) => part.toString(16).padStart(2, '0')).join('')}`;
+};
+
+const hexToRgbString = (hex: string) => {
+    const normalized = hex.replace('#', '').trim();
+    const full = normalized.length === 3
+        ? normalized.split('').map((ch) => `${ch}${ch}`).join('')
+        : normalized;
+    if (full.length !== 6) return null;
+    const r = Number.parseInt(full.slice(0, 2), 16);
+    const g = Number.parseInt(full.slice(2, 4), 16);
+    const b = Number.parseInt(full.slice(4, 6), 16);
+    if ([r, g, b].some((part) => Number.isNaN(part))) return null;
+    return `${r} ${g} ${b}`;
+};
+
 const AppearanceTab: React.FC<AppearanceTabProps> = ({ settings, onChange }) => {
     const isBackgroundEnabled = !!settings.backgroundImageEnabled;
     const isBackgroundMotionEnabled = !!settings.backgroundMotion;
+    const accentHex = rgbStringToHex(settings.accentColor || DEFAULT_ACCENT_COLOR);
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
@@ -23,6 +52,7 @@ const AppearanceTab: React.FC<AppearanceTabProps> = ({ settings, onChange }) => 
                         { name: 'Rose', value: '244 63 94', class: 'bg-rose-500' },
                         { name: 'Orange', value: '249 115 22', class: 'bg-orange-500' },
                         { name: 'Emerald', value: '16 185 129', class: 'bg-emerald-500' },
+                        { name: 'Gray', value: '100 116 139', class: 'bg-slate-500' },
                     ].map((color) => (
                         <button
                             key={color.value}
@@ -32,11 +62,27 @@ const AppearanceTab: React.FC<AppearanceTabProps> = ({ settings, onChange }) => 
                         >
                             {settings.accentColor === color.value && (
                                 <div className="absolute inset-0 flex items-center justify-center">
-                                    <div className="w-2.5 h-2.5 bg-white rounded-full shadow-sm" />
+                                    <div className="w-2.5 h-2.5 rounded-full shadow-sm bg-white" />
                                 </div>
                             )}
                         </button>
                     ))}
+                </div>
+                <div className="mt-4 flex items-center gap-3">
+                    <input
+                        type="color"
+                        value={accentHex}
+                        onChange={(e) => {
+                            const rgb = hexToRgbString(e.target.value);
+                            if (rgb) {
+                                onChange('accentColor', rgb);
+                            }
+                        }}
+                        className="h-9 w-12 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-800 cursor-pointer"
+                        title="自定义颜色"
+                        aria-label="自定义颜色"
+                    />
+                    <span className="text-xs text-slate-500 dark:text-slate-400">自定义颜色</span>
                 </div>
             </div>
 
