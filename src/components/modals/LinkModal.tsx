@@ -3,6 +3,7 @@ import { X, Sparkles, Loader2, Pin, Wand2, Trash2, Upload } from 'lucide-react';
 import { LinkItem, Category, AIConfig } from '../../types';
 import { generateLinkDescription, suggestCategory } from '../../services/geminiService';
 import { useDialog } from '../ui/DialogProvider';
+import { getIconToneStyle, normalizeHexColor } from '../../utils/iconTone';
 
 const FAVICON_CACHE_KEY = 'ynav_favicon_cache';
 
@@ -35,6 +36,8 @@ const LinkModal: React.FC<LinkModalProps> = ({
   const [categoryId, setCategoryId] = useState(categories[0]?.id || 'common');
   const [pinned, setPinned] = useState(false);
   const [icon, setIcon] = useState('');
+  const [iconTone, setIconTone] = useState('');
+  const [iconToneInput, setIconToneInput] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isFetchingIcon, setIsFetchingIcon] = useState(false);
   const [autoFetchIcon, setAutoFetchIcon] = useState(true);
@@ -70,6 +73,8 @@ const LinkModal: React.FC<LinkModalProps> = ({
         setCategoryId(initialData.categoryId);
         setPinned(initialData.pinned || false);
         setIcon(initialData.icon || '');
+        setIconTone(initialData.iconTone || '');
+        setIconToneInput(initialData.iconTone || '');
       } else {
         setTitle('');
         setUrl('');
@@ -79,6 +84,8 @@ const LinkModal: React.FC<LinkModalProps> = ({
         setCategoryId(defaultCategory ? defaultCategoryId : (categories[0]?.id || 'common'));
         setPinned(false);
         setIcon('');
+        setIconTone('');
+        setIconToneInput('');
       }
     }
   }, [isOpen, initialData, categories, defaultCategoryId]);
@@ -133,6 +140,7 @@ const LinkModal: React.FC<LinkModalProps> = ({
       title,
       url: finalUrl,
       icon,
+      iconTone: iconTone || undefined,
       description,
       categoryId,
       pinned
@@ -152,6 +160,8 @@ const LinkModal: React.FC<LinkModalProps> = ({
       setIcon('');
       setDescription('');
       setPinned(false);
+      setIconTone('');
+      setIconToneInput('');
       // 如果开启自动获取图标，尝试获取新图标
       if (autoFetchIcon && finalUrl) {
         handleFetchIcon();
@@ -292,6 +302,28 @@ const LinkModal: React.FC<LinkModalProps> = ({
     fileInputRef.current?.click();
   };
 
+  const handleToneInputChange = (value: string) => {
+    setIconToneInput(value);
+    const normalized = normalizeHexColor(value);
+    if (normalized) {
+      setIconTone(normalized);
+    } else if (!value.trim()) {
+      setIconTone('');
+    }
+  };
+
+  const handleTonePickerChange = (value: string) => {
+    const normalized = normalizeHexColor(value);
+    const finalValue = normalized || value;
+    setIconTone(finalValue);
+    setIconToneInput(finalValue);
+  };
+
+  const handleToneAuto = () => {
+    setIconTone('');
+    setIconToneInput('');
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -404,7 +436,10 @@ const LinkModal: React.FC<LinkModalProps> = ({
 
             {/* Icon Section */}
             <div className="flex gap-3 items-start">
-              <div className="w-12 h-12 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden shrink-0 shadow-sm p-2">
+              <div
+                className="w-12 h-12 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden shrink-0 shadow-sm p-2"
+                style={getIconToneStyle(iconTone)}
+              >
                 {icon ? (
                   <img
                     src={icon}
@@ -463,6 +498,30 @@ const LinkModal: React.FC<LinkModalProps> = ({
                     </label>
                   </div>
                   <span className="text-[10px] text-slate-400 dark:text-slate-500">支持 SVG, PNG, ICO</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400">图标颜色</span>
+                  <input
+                    type="color"
+                    value={normalizeHexColor(iconToneInput) || '#64748b'}
+                    onChange={(e) => handleTonePickerChange(e.target.value)}
+                    className="h-8 w-8 rounded-md border border-slate-200 dark:border-slate-700 bg-transparent cursor-pointer"
+                    aria-label="选择图标颜色"
+                  />
+                  <input
+                    type="text"
+                    value={iconToneInput}
+                    onChange={(e) => handleToneInputChange(e.target.value)}
+                    placeholder="#RRGGBB"
+                    className="w-24 px-2 py-1.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-md text-[10px] text-slate-600 dark:text-slate-300 placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleToneAuto}
+                    className="px-2 py-1.5 rounded-md text-[10px] font-semibold border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                  >
+                    自动
+                  </button>
                 </div>
                 <input
                   ref={fileInputRef}

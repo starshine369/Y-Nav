@@ -21,9 +21,41 @@ const hashString = (value: string) => {
   return hash;
 };
 
+const toHex = (value: string) => value.trim().replace(/^#/, '');
+
+export const normalizeHexColor = (value?: string) => {
+  if (!value) return null;
+  const hex = toHex(value);
+  if (/^[0-9a-fA-F]{6}$/.test(hex)) return `#${hex.toLowerCase()}`;
+  if (/^[0-9a-fA-F]{3}$/.test(hex)) {
+    const expanded = hex.split('').map(ch => `${ch}${ch}`).join('');
+    return `#${expanded.toLowerCase()}`;
+  }
+  return null;
+};
+
+const hexToRgb = (hex: string) => {
+  const normalized = normalizeHexColor(hex);
+  if (!normalized) return null;
+  const raw = normalized.replace('#', '');
+  const r = parseInt(raw.slice(0, 2), 16);
+  const g = parseInt(raw.slice(2, 4), 16);
+  const b = parseInt(raw.slice(4, 6), 16);
+  return { r, g, b };
+};
+
 export const getIconToneClass = (icon?: string, url?: string, title?: string) => {
   const seed = [icon, url, title].filter(Boolean).join('|');
   if (!seed) return DEFAULT_TONE;
   const index = hashString(seed) % PALETTE.length;
   return PALETTE[index] || DEFAULT_TONE;
+};
+
+export const getIconToneStyle = (hexColor?: string) => {
+  const rgb = hexToRgb(hexColor || '');
+  if (!rgb) return undefined;
+  return {
+    backgroundColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2)`,
+    color: `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`
+  };
 };

@@ -1,7 +1,7 @@
 import React from 'react';
 import { LinkItem } from '../../types';
 import { Settings } from 'lucide-react';
-import { getIconToneClass } from '../../utils/iconTone';
+import { getIconToneClass, getIconToneStyle } from '../../utils/iconTone';
 
 interface LinkCardProps {
     link: LinkItem;
@@ -38,7 +38,8 @@ const LinkCard: React.FC<LinkCardProps> = ({
         ${isDetailedView ? 'p-5' : 'p-3.5'}
     `;
 
-    const colorClass = getIconToneClass(link.icon, link.url, link.title);
+    const customToneStyle = getIconToneStyle(link.iconTone);
+    const colorClass = customToneStyle ? '' : getIconToneClass(link.icon, link.url, link.title);
 
     const iconContainerClasses = `
         flex items-center justify-center shrink-0 rounded-xl overflow-hidden shadow-sm transition-transform duration-300 group-hover:scale-105
@@ -69,7 +70,7 @@ const LinkCard: React.FC<LinkCardProps> = ({
         <>
             {/* Icon + Title Row */}
             <div className="flex items-center gap-3">
-                <div className={iconContainerClasses}>
+                <div className={iconContainerClasses} style={customToneStyle}>
                     {link.icon ? (
                         <img src={link.icon} alt="" className={isDetailedView ? "w-6 h-6" : "w-5 h-5"} />
                     ) : (

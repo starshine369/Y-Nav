@@ -3,6 +3,7 @@ export interface LinkItem {
   title: string;
   url: string;
   icon?: string;
+  iconTone?: string;
   description?: string;
   categoryId: string;
   createdAt: number;
