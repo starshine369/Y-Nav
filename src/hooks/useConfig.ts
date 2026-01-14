@@ -19,7 +19,7 @@ const DEFAULT_SITE_SETTINGS: SiteSettings = {
     closeOnBackdrop: false,
     backgroundImage: '',
     backgroundImageEnabled: false,
-    backgroundMotion: false
+    backgroundMotion: true
 };
 
 export function useConfig() {

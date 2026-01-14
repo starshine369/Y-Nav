@@ -70,6 +70,7 @@ export interface SearchConfig {
   mode: SearchMode;
   externalSources: ExternalSearchSource[];
   selectedSource?: ExternalSearchSource | null; // 选中的搜索源
+  selectedSourceId?: string; // 选中的搜索源ID
 }
 
 export const DEFAULT_CATEGORIES: Category[] = [

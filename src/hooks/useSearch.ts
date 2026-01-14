@@ -19,6 +19,25 @@ const buildDefaultSearchSources = (): ExternalSearchSource[] => {
     ];
 };
 
+const resolveSelectedSource = (
+    sources: ExternalSearchSource[],
+    selectedId?: string | null,
+    selectedSource?: ExternalSearchSource | null
+): ExternalSearchSource | null => {
+    if (sources.length === 0) {
+        return selectedSource ?? null;
+    }
+    if (selectedId) {
+        const matched = sources.find(source => source.id === selectedId);
+        if (matched) return matched;
+    }
+    if (selectedSource) {
+        const matched = sources.find(source => source.id === selectedSource.id);
+        return matched ?? selectedSource;
+    }
+    return sources.find(source => source.enabled) || sources[0] || null;
+};
+
 export function useSearch() {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchMode, setSearchMode] = useState<SearchMode>('external');
@@ -34,16 +53,17 @@ export function useSearch() {
 
     // Save search config to localStorage
     const saveSearchConfig = useCallback((sources: ExternalSearchSource[], mode: SearchMode, selected?: ExternalSearchSource | null) => {
+        const candidate = selected !== undefined ? selected : selectedSearchSource;
+        const resolvedSelected = resolveSelectedSource(sources, candidate?.id, candidate);
         const searchConfig: SearchConfig = {
             mode,
             externalSources: sources,
-            selectedSource: selected !== undefined ? selected : selectedSearchSource
+            selectedSource: resolvedSelected,
+            selectedSourceId: resolvedSelected?.id
         };
         setExternalSearchSources(sources);
         setSearchMode(mode);
-        if (selected !== undefined) {
-            setSelectedSearchSource(selected);
-        }
+        setSelectedSearchSource(resolvedSelected);
         localStorage.setItem(SEARCH_CONFIG_KEY, JSON.stringify(searchConfig));
     }, [selectedSearchSource]);
 
@@ -98,7 +118,9 @@ export function useSearch() {
 
     // Restore search config
     const restoreSearchConfig = useCallback((config: SearchConfig) => {
-        saveSearchConfig(config.externalSources, config.mode, config.selectedSource);
+        const sources = config.externalSources || [];
+        const resolvedSelected = resolveSelectedSource(sources, config.selectedSourceId, config.selectedSource ?? null);
+        saveSearchConfig(sources, config.mode, resolvedSelected);
     }, [saveSearchConfig]);
 
     // Toggle mobile search
@@ -116,11 +138,15 @@ export function useSearch() {
             try {
                 const parsed = JSON.parse(savedSearchConfig) as SearchConfig;
                 if (parsed?.mode) {
+                    const sources = parsed.externalSources || [];
+                    const resolvedSelected = resolveSelectedSource(
+                        sources,
+                        parsed.selectedSourceId,
+                        parsed.selectedSource ?? null
+                    );
                     setSearchMode(parsed.mode);
-                    setExternalSearchSources(parsed.externalSources || []);
-                    if (parsed.selectedSource) {
-                        setSelectedSearchSource(parsed.selectedSource);
-                    }
+                    setExternalSearchSources(sources);
+                    setSelectedSearchSource(resolvedSelected);
                 }
             } catch (e) { }
         } else {
