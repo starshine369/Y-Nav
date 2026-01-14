@@ -95,6 +95,9 @@ export const generateLinkDescription = async (title: string, url: string, config
  */
 export const suggestCategory = async (title: string, url: string, categories: { id: string, name: string }[], config: AIConfig): Promise<string | null> => {
     if (!config.apiKey) return null;
+    if (categories.length === 0) return null;
+
+    const fallbackId = categories.find(c => c.id === 'common')?.id || categories[0].id;
 
     const catList = categories.map(c => `${c.id}: ${c.name}`).join('\n');
     const prompt = `
@@ -103,8 +106,15 @@ export const suggestCategory = async (title: string, url: string, categories: { 
         Available Categories:
         ${catList}
 
-        Return ONLY the 'id' of the best matching category. If unsure, return 'common'.
+        Return ONLY the 'id' of the best matching category. If unsure, return '${fallbackId}'.
     `;
+
+    const normalizeCategoryId = (value: string | null | undefined): string | null => {
+        if (!value) return null;
+        const trimmed = value.trim();
+        if (!trimmed) return null;
+        return categories.some(c => c.id === trimmed) ? trimmed : fallbackId;
+    };
 
     try {
         if (config.provider === 'gemini') {
@@ -115,7 +125,7 @@ export const suggestCategory = async (title: string, url: string, categories: { 
                 model: modelName,
                 contents: `Task: Categorize this website.\n${prompt}`,
             });
-            return response.text ? response.text.trim() : null;
+            return normalizeCategoryId(response.text);
         } else {
             // OpenAI Compatible
             const result = await callOpenAICompatible(
@@ -123,7 +133,7 @@ export const suggestCategory = async (title: string, url: string, categories: { 
                 "You are an intelligent classification assistant. You only output the category ID.",
                 prompt
             );
-            return result || null;
+            return normalizeCategoryId(result);
         }
     } catch (e) {
         console.error(e);

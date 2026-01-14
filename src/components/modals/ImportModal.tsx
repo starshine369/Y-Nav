@@ -173,6 +173,10 @@ const ImportModal: React.FC<ImportModalProps> = ({
                 }
             });
 
+            const fallbackCategoryId = categories.find(c => c.id === 'common')?.id
+                || categories[0]?.id
+                || categoriesToAdd[0]?.id;
+
             // Remap links
             finalLinks = finalLinks.map(link => {
                 // Find the name of the category this link was assigned to in the parser
@@ -182,8 +186,10 @@ const ImportModal: React.FC<ImportModalProps> = ({
                 if (originalCat && nameToIdMap.has(originalCat.name)) {
                     return { ...link, categoryId: nameToIdMap.get(originalCat.name)! };
                 }
-                // If for some reason we can't find the map, put it in common
-                return { ...link, categoryId: 'common' };
+                // If for some reason we can't find the map, put it in a fallback category
+                return fallbackCategoryId
+                    ? { ...link, categoryId: fallbackCategoryId }
+                    : link;
             });
 
             finalCategories = categoriesToAdd;

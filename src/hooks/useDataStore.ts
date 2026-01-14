@@ -47,36 +47,34 @@ export const useDataStore = () => {
         if (stored) {
             try {
                 const parsed = JSON.parse(stored);
-                let loadedCategories = parsed.categories || DEFAULT_CATEGORIES;
+                let loadedCategories = parsed.categories && parsed.categories.length > 0
+                    ? parsed.categories
+                    : DEFAULT_CATEGORIES;
 
-                // 确保"常用推荐"分类始终存在，并确保它是第一个分类
-                if (!loadedCategories.some((c: Category) => c.id === 'common')) {
+                // 如果"常用推荐"分类存在，确保它是第一个分类
+                const commonIndex = loadedCategories.findIndex((c: Category) => c.id === 'common');
+                if (commonIndex > 0) {
+                    const commonCategory = loadedCategories[commonIndex];
                     loadedCategories = [
-                        { id: 'common', name: '常用推荐', icon: 'Star' },
-                        ...loadedCategories
+                        commonCategory,
+                        ...loadedCategories.slice(0, commonIndex),
+                        ...loadedCategories.slice(commonIndex + 1)
                     ];
-                } else {
-                    // 如果"常用推荐"分类已存在，确保它是第一个分类
-                    const commonIndex = loadedCategories.findIndex((c: Category) => c.id === 'common');
-                    if (commonIndex > 0) {
-                        const commonCategory = loadedCategories[commonIndex];
-                        loadedCategories = [
-                            commonCategory,
-                            ...loadedCategories.slice(0, commonIndex),
-                            ...loadedCategories.slice(commonIndex + 1)
-                        ];
-                    }
                 }
 
-                // 检查是否有链接的categoryId不存在于当前分类中，将这些链接移动到"常用推荐"
+                // 检查是否有链接的categoryId不存在于当前分类中，将这些链接移动到默认分类
                 const validCategoryIds = new Set(loadedCategories.map((c: Category) => c.id));
+                const fallbackCategoryId = loadedCategories.find((c: Category) => c.id === 'common')?.id
+                    || loadedCategories[0]?.id;
                 let loadedLinks = parsed.links || INITIAL_LINKS;
-                loadedLinks = loadedLinks.map((link: LinkItem) => {
-                    if (!validCategoryIds.has(link.categoryId)) {
-                        return { ...link, categoryId: 'common' };
-                    }
-                    return link;
-                });
+                if (fallbackCategoryId) {
+                    loadedLinks = loadedLinks.map((link: LinkItem) => {
+                        if (!validCategoryIds.has(link.categoryId)) {
+                            return { ...link, categoryId: fallbackCategoryId };
+                        }
+                        return link;
+                    });
+                }
 
                 setLinks(loadedLinks);
                 setCategories(loadedCategories);
@@ -236,24 +234,19 @@ export const useDataStore = () => {
     }, [links, categories, updateData]);
 
     const deleteCategory = useCallback((catId: string) => {
-        if (catId === 'common') {
-            alert('"常用推荐"分类不能被删除');
+        if (categories.length <= 1) {
+            alert('至少保留一个分类');
             return;
         }
-        let newCats = categories.filter(c => c.id !== catId);
-        if (!newCats.some(c => c.id === 'common')) {
-            newCats = [{ id: 'common', name: '常用推荐', icon: 'Star' }, ...newCats];
-        }
-        const targetId = 'common';
-        const newLinks = links.map(l => l.categoryId === catId ? { ...l, categoryId: targetId } : l);
+        const newCats = categories.filter(c => c.id !== catId);
+        if (newCats.length === categories.length) return;
+        const fallbackCategory = newCats.find(c => c.id === 'common') || newCats[0];
+        const newLinks = links.map(l => l.categoryId === catId ? { ...l, categoryId: fallbackCategory.id } : l);
         updateData(newLinks, newCats);
     }, [links, categories, updateData]);
 
     const importData = useCallback((newLinks: LinkItem[], newCategories: Category[]) => {
         const mergedCategories = [...categories];
-        if (!mergedCategories.some(c => c.id === 'common')) {
-            mergedCategories.push({ id: 'common', name: '常用推荐', icon: 'Star' });
-        }
         newCategories.forEach(nc => {
             if (!mergedCategories.some(c => c.id === nc.id || c.name === nc.name)) {
                 mergedCategories.push(nc);
@@ -280,4 +273,3 @@ export const useDataStore = () => {
         importData
     };
 };
-

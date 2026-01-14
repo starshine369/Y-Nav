@@ -54,14 +54,21 @@ const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
 
   // 全选/取消全选
   const toggleSelectAll = () => {
-    if (selectedCategories.size === categories.filter(c => c.id !== 'common').length) {
+    if (selectedCategories.size === categories.length) {
       // 已全选,取消全选
       setSelectedCategories(new Set());
     } else {
-      // 全选所有非"常用推荐"的分类
-      const allIds = new Set(categories.filter(c => c.id !== 'common').map(c => c.id));
+      // 全选所有分类
+      const allIds = new Set(categories.map(c => c.id));
       setSelectedCategories(allIds);
     }
+  };
+
+  const getFallbackCategory = (excludeIds: Set<string>) => {
+    const remaining = categories.filter(c => !excludeIds.has(c.id));
+    if (remaining.length === 0) return null;
+    const common = remaining.find(c => c.id === 'common');
+    return common || remaining[0];
   };
 
   // 批量删除
@@ -71,7 +78,13 @@ const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
       return;
     }
 
-    if (confirm(`确定删除选中的 ${selectedCategories.size} 个分类吗?这些分类下的书签将移动到"常用推荐"。`)) {
+    const fallbackCategory = getFallbackCategory(selectedCategories);
+    if (!fallbackCategory) {
+      alert('至少保留一个分类');
+      return;
+    }
+
+    if (confirm(`确定删除选中的 ${selectedCategories.size} 个分类吗?这些分类下的书签将移动到"${fallbackCategory.name}"。`)) {
       selectedCategories.forEach(id => onDeleteCategory(id));
       setSelectedCategories(new Set());
       setIsBatchMode(false);
@@ -93,7 +106,17 @@ const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
   };
 
   const handleDeleteClick = (cat: Category) => {
-    if (confirm(`确定删除"${cat.name}"分类吗？该分类下的书签将移动到"常用推荐"。`)) {
+    const fallbackCategory = getFallbackCategory(new Set([cat.id]));
+    if (!fallbackCategory) {
+      alert('至少保留一个分类');
+      return;
+    }
+
+    const prompt = cat.id === 'common'
+      ? `确定删除默认分类"${cat.name}"吗？该分类下的书签将移动到"${fallbackCategory.name}"。`
+      : `确定删除"${cat.name}"分类吗？该分类下的书签将移动到"${fallbackCategory.name}"。`;
+
+    if (confirm(prompt)) {
       onDeleteCategory(cat.id);
     }
   };
@@ -186,7 +209,7 @@ const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
                 onClick={toggleSelectAll}
                 className="flex items-center gap-2 text-sm text-accent dark:text-accent hover:opacity-80"
               >
-                {selectedCategories.size === categories.filter(c => c.id !== 'common').length ? (
+                {selectedCategories.size === categories.length ? (
                   <CheckSquare size={16} />
                 ) : (
                   <Square size={16} />
@@ -219,12 +242,9 @@ const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
                 {isBatchMode && (
                   <button
                     onClick={() => toggleCategorySelection(cat.id)}
-                    disabled={cat.id === 'common'}
                     className="flex-shrink-0 p-1"
                   >
-                    {cat.id === 'common' ? (
-                      <Square size={18} className="text-slate-300 dark:text-slate-600" />
-                    ) : selectedCategories.has(cat.id) ? (
+                    {selectedCategories.has(cat.id) ? (
                       <CheckSquare size={18} className="text-accent" />
                     ) : (
                       <Square size={18} className="text-slate-400 hover:text-accent" />
@@ -253,7 +273,7 @@ const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
                 )}
 
                 <div className="flex items-center gap-2">
-                  {editingId === cat.id && cat.id !== 'common' ? (
+                  {editingId === cat.id ? (
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center gap-2">
                         <Icon name={editIcon} size={16} />
@@ -281,7 +301,7 @@ const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
                       <span className="font-medium dark:text-slate-200 truncate">
                         {cat.name}
                         {cat.id === 'common' && (
-                          <span className="ml-2 text-xs text-slate-400">(默认分类，不可编辑)</span>
+                          <span className="ml-2 text-xs text-slate-400">(默认分类)</span>
                         )}
                       </span>
                     </div>
@@ -295,26 +315,15 @@ const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
                       <button onClick={saveEdit} className="text-green-500 hover:bg-green-50 dark:hover:bg-slate-600 p-1.5 rounded bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-600"><Check size={16} /></button>
                     ) : (
                       <>
-                        {cat.id !== 'common' && (
-                          <button onClick={() => handleStartEdit(cat)} className="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-slate-200 dark:hover:bg-slate-600 rounded">
-                            <Edit2 size={14} />
-                          </button>
-                        )}
-                        {/* 只有非"常用推荐"分类才显示删除按钮 */}
-                        {cat.id !== 'common' && (
-                          <button
-                            onClick={() => handleDeleteClick(cat)}
-                            className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-slate-200 dark:hover:bg-slate-600 rounded"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        )}
-                        {/* "常用推荐"分类提示不可删除 */}
-                        {cat.id === 'common' && (
-                          <div className="px-2 text-xs text-slate-400" title="常用推荐分类不能被删除">
-                            不可删除
-                          </div>
-                        )}
+                        <button onClick={() => handleStartEdit(cat)} className="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-slate-200 dark:hover:bg-slate-600 rounded">
+                          <Edit2 size={14} />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteClick(cat)}
+                          className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-slate-200 dark:hover:bg-slate-600 rounded"
+                        >
+                          <Trash2 size={14} />
+                        </button>
                       </>
                     )}
                   </div>

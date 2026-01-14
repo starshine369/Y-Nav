@@ -331,15 +331,18 @@ function App() {
     if (addUrl) {
       const addTitle = urlParams.get('add_title') || '';
       window.history.replaceState({}, '', window.location.pathname);
+      const fallbackCategoryId = selectedCategory !== 'all'
+        ? selectedCategory
+        : (categories.find(c => c.id === 'common')?.id || categories[0]?.id || 'common');
       setPrefillLink({
         title: addTitle,
         url: addUrl,
-        categoryId: 'common'
+        categoryId: fallbackCategoryId
       });
       setEditingLink(undefined);
       openAddLinkModal();
     }
-  }, [setPrefillLink, setEditingLink, openAddLinkModal]);
+  }, [setPrefillLink, setEditingLink, openAddLinkModal, categories, selectedCategory]);
 
   // === Appearance Setup ===
   useEffect(() => {
