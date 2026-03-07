@@ -7,7 +7,7 @@
 
 name = "y-nav"
 main = "worker/index.ts"
-compatibility_date = "2026-03-07"
+compatibility_date = "2024-01-01"
 
 # 静态资源目录 (Workers Sites)
 [site]
